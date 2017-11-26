@@ -45,6 +45,17 @@
             <br><br><br>
             <div class="row">
                 <div class="col-md-12">
+                    <% if(sendcode.length > 0){
+                    if(sendcode.code == 1){ %>
+                    <div class="alert alert-success">
+                        <p><$= sendcode.msg %></p>
+                    </div>
+                    <% }else{%>
+                    <div class="alert alert-danger">
+                        <p><$= sendcode.msg %></p>
+                    </div>
+                    <% }
+                    }%>
                     <form class="form-horizontal" action="" method="post">
                         <div class="form-group">
                             <label for="penerima">Send to : </label>
@@ -75,7 +86,18 @@
                             <tr>
                                 <td><%= d.number %></td>
                                 <td><%= d.message %></td>
-                                <td><%= d.status %></td>
+                                <td><% 
+                                    if(d.status)
+                                    {
+                                    %>
+                                    <span class='label label-success'>Sukses</span>
+                                    <%
+                                    }else{
+                                    %>
+                                    <span class='label label-danger'>Gagal</span>
+                                    <%
+                                    }
+                                    %></td>
                                 <td><%= d.date %></td>
                             </tr>
                             <% }) %>

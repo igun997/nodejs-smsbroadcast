@@ -9,7 +9,6 @@ const querystring = require('querystring');
 const https = require('https');
 const request = require("request")
 const striptags = require('striptags');
-const sqlinjection = require('sql-injection');
 
 
 const con = mysql.createConnection({
@@ -19,27 +18,26 @@ const con = mysql.createConnection({
     database: 'sms'
 });
 con.connect();
-app.use(sqlinjection); 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, '/views'));
 app.use("/css", express.static(__dirname + '/public'));
-var client_id = "xxx";
-var secret_id = "xx";
+var client_id = "1m7F1hfeuxTxLfHG9nAeSQDfQZga";
+var secret_id = "PTQ2pKhOgIdfLxWTmjE1UL1BSvEa";
 var token = new Buffer(client_id + ":" + secret_id).toString('base64');
 console.log("Token : " + token);
 
 app.get('/', (req, res) => {
     let sql = "select * from log";
     con.query(sql, (err, result, fields) => {
-        res.render('index', {data: result, judul: "SMS Broadcast"});
+        res.render('index', {data: result,sendcode:{}, judul: "SMS Broadcast"});
     });
 });
 app.post('/', (req, res) => {
     let sendto = req.body.penerima,
             message = striptags(req.body.isi);
-            
+
     var postData = querystring.stringify({
         'grant_type': 'client_credentials'
     });
@@ -80,15 +78,37 @@ app.post('/', (req, res) => {
                 if (resul.code == 1)
                 {
                     var msg = "Send Success";
+                    con.query("INSERT INTO log (number,message,status) VALUES('" + sendto + "','" + message + "',1)", (err, result, fields) => {
+                        console.log("Success");
+                        console.log(err);
+                        console.log(result);
+                        if (err)
+                        {
+                            console.log("1 Row Inserted")
+                        } else {
+                            console.log("Failed to Insert")
+                        }
+                    });
                 } else {
                     var msg = "Send Failed";
+                    con.query("INSERT INTO log (number,message,status) VALUES('" + sendto + "','" + message + "',0)", (err, result, fields) => {
+                        console.log("Fail");
+                        console.log(err);
+                        console.log(result);
+                        if (err)
+                        {
+                            console.log("1 Row Inserted")
+                        } else {
+                            console.log("Failed to Insert")
+                        }
+                    });
                 }
                 console.log(resul);
                 console.log(ap);
                 console.log(message);
                 let sql = "select * from log";
                 con.query(sql, (err, result, fields) => {
-                    res.render('index', {data: result,sendcode:{code:resul.code,msg:msg},judul: "SMS Broadcast"});
+                    res.render('index', {data: result, sendcode: {code: resul.code, msg: msg}, judul: "SMS Broadcast"});
                 });
             }
             request(sendoptions, callsend);
