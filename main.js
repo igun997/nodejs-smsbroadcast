@@ -23,8 +23,8 @@ app.use(bodyParser.json());
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, '/views'));
 app.use("/css", express.static(__dirname + '/public'));
-var client_id = "1m7F1hfeuxTxLfHG9nAeSQDfQZga";
-var secret_id = "PTQ2pKhOgIdfLxWTmjE1UL1BSvEa";
+var client_id = "xx";
+var secret_id = "xx";
 var token = new Buffer(client_id + ":" + secret_id).toString('base64');
 console.log("Token : " + token);
 
